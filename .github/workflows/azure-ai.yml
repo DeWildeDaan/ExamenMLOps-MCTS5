@@ -1,162 +1,34 @@
-# This is a basic workflow to help you get started with Actions
-
-name: MLOps Azure Data Preparing and AI Training
+name: Docker Build and Push to GHCR
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events
-  workflow_call:
-    inputs:
-      data_prep:
-        description: '---Data preparing---'
-        type: boolean
-        default: true
-        required: true
-      process_images:
-        description: 'Check to process the original data.'
-        type: boolean
-        default: true
-        required: true
-      ai_training:
-        description: '---AI Training---'
-        type: boolean
-        required: true
-        default: true
-      train_on_local:
-        description: 'Check if you want to train on the runner. Otherwise we train on Azure cloud machine'
-        type: boolean
-        default: false
-        required: true
-      api_creation:
-        description: '---API Creation---'
-        type: boolean
-        default: true
-        required: true
-      create_docker_image:
-        description: 'Check if you want to create a docker image of the API.'
-        type: boolean
-        default: true
-        required: true
-      azure_deployment:
-        description: 'Check if we should deploy the API on AZURE.'
-        type: boolean
-        default: false
-        required: true
-      remove_deployment:
-        description: 'Check if we should remove/update the previous docker/kubernetis deployment of the API LOCALLY. (if this is not a cold start)'
-        type: boolean
-        default: true
-        required: true
-      docker_deployment:
-        description: 'Check if we should run the docker image of the API LOCALLY.'
-        type: boolean
-        default: false
-        required: true
-      kubernetis_deployment:
-        description: 'Check if we should deploy the API on KUBERNETIS.'
-        type: boolean
-        default: false
-        required: true
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
+  # Manual trigger
   workflow_dispatch:
-    branches: [ main, lessonsteps/** ]
-    inputs:
-      data_prep:
-        description: '---Data preparing---'
-        type: boolean
-        required: true
-        default: true
-      process_images:
-        description: 'Check to process the original data.'
-        type: boolean
-        default: true
-        required: true
-      ai_training:
-        description: '---AI Training---'
-        type: boolean
-        required: true
-        default: true
-      train_on_local:
-        description: 'Check if you want to train on the runnder. Otherwise we train on Azure cloud machine'
-        type: boolean
-        default: false
-        required: true
-      api_creation:
-        description: '---API Creation---'
-        type: boolean
-        default: true
-        required: true
-      create_docker_image:
-        description: 'Check if you want to create a docker image of the API.'
-        type: boolean
-        default: true
-        required: true
-      azure_deployment:
-        description: 'Check if we should deploy the API on AZURE.'
-        type: boolean
-        default: false
-        required: true
-      remove_deployment:
-        description: 'Check if we should remove/update the previous docker/kubernetis deployment of the API LOCALLY. (if this is not a cold start)'
-        type: boolean
-        default: true
-        required: true
-      docker_deployment:
-        description: 'Check if we should run the docker image of the API LOCALLY.'
-        type: boolean
-        default: false
-        required: true
-      kubernetis_deployment:
-        description: 'Check if we should deploy the API on KUBERNETIS.'
-        type: boolean
-        default: true
-        required: true
-env:
-  GIT_SHA: ${{ github.sha }}
 
 jobs:
-  api-creation:
-    runs-on: ubuntu-20.04
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Upload API Code for Docker
-        if: inputs.create_docker_image
-        uses: actions/upload-artifact@v2
-        with:
-          name: docker-config
-          path: api
-
   docker-build-and-push:
-    needs: [api-creation]
-
-    runs-on: ubuntu-20.04
-
+    runs-on: ubuntu-latest # Machines from GitHub
+    permissions:
+      packages: write
     steps:
-      - name: Download docker-config artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: docker-config
+      - uses: actions/checkout@v2 # Download the code
 
-      - name: Gather Docker Meta Information
+      - name: Docker Meta Information
         id: meta
         uses: docker/metadata-action@v3
         with:
           # list of Docker images to use as base name for tags
           images: |
             ghcr.io/dewildedaan/mlops-exam-1-frontend
-          flavor: |
-            latest=true
-          # generate Docker tags based on the following events/attributes:
-          # The GitHub Branch
-          # The GitHub SHA
-          # More info: https://github.com/docker/build-push-action/blob/master/docs/advanced/tags-labels.md
           tags: |
             type=ref,event=branch
             type=sha,format=long
-      
-      # Enter your GITHUB Token here!
       - name: Login to GHCR
         uses: docker/login-action@v1
         with:
@@ -168,7 +40,6 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: .
+          context: ./frontend
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-  

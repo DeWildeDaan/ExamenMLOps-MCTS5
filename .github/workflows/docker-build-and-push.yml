@@ -24,6 +24,8 @@ jobs:
           # list of Docker images to use as base name for tags
           images: |
             ghcr.io/dewildedaan/mlops-exam-1-frontend
+          flavor: |
+            latest=true
           tags: |
             type=ref,event=branch
             type=sha,format=long
@@ -56,6 +58,8 @@ jobs:
           # list of Docker images to use as base name for tags
           images: |
             ghcr.io/dewildedaan/mlops-exam-1-backend
+          flavor: |
+            latest=true
           tags: |
             type=ref,event=branch
             type=sha,format=long

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlops-exam-1-frontend-dpl
+  labels:
+    app: mlops-exam-1-frontend-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlops-exam-1-frontend-app
+  template:
+    metadata:
+      labels:
+        app: mlops-exam-1-frontend-app
+    spec:
+      containers:
+      - name: mlops-exam-1-frontend-app
+        image: ghcr.io/dewildedaan/mlops-exam-1-frontend:latest
+        ports:
+        - containerPort: 8080
+      restartPolicy: Always

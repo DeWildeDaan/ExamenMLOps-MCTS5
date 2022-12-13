@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: daandewilde-exam-1
+data:
+  NAME: "daandewilde"
+  DATE: "13/12/2022"

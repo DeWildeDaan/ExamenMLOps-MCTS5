@@ -1,6 +1,20 @@
 services:
   api:
-    image: version-1
+    image: daandewilde/mlops-exam-1-backend:latest
     build:
-      context: .
-      dockerfile: exam-1-dockerfile
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8181:8181"
+
+  # create a new service called forntend
+  frontend:
+    depends_on:
+      - api
+    image: daandewilde/mlops-exam-1-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    

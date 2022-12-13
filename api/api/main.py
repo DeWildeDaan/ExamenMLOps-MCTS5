@@ -20,6 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @retry(delay=2)
 def read_in_all_courses(limit: int = -1) -> List[Course]:
     """
@@ -38,15 +39,19 @@ def read_in_all_courses(limit: int = -1) -> List[Course]:
             print('Error with file', course)
     return all_courses
 
+
 all_courses = read_in_all_courses(-1)
+
 
 @app.get("/")
 async def root():
     return {"message": "I am working correctly!"}
 
+
 @app.get("/docker_test")
 async def docker_test():
     return os.environ
+
 
 @app.get('/mct/courses')
 async def get_all_courses():

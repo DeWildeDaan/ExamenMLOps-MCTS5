@@ -37,11 +37,11 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 COPY ./pyproject.toml ./poetry.lock* /app/
 
 RUN poetry export --without-hashes -f requirements.txt > requirements.txt \
-        && pip wheel --wheel-dir=/root/wheels -r requirements.txt
-
-
+    && pip wheel --wheel-dir=/root/wheels -r requirements.txt
 
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-alpine3.14 as production-image
+
+EXPOSE 8181
 
 ENV PYTHONUNBUFFERED=1 \
     # prevents python creating .pyc files
@@ -59,6 +59,8 @@ COPY --from=build-image /app/requirements.txt ./
 
 RUN pip install --no-index --find-links=/root/wheels -r requirements.txt
 
+RUN pip install retry
+
 COPY ./api ./
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8181"]

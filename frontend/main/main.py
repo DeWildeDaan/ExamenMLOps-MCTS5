@@ -4,13 +4,14 @@ from fastapi.templating import Jinja2Templates
 
 import requests
 import json
-import os, time
+import os
+import time
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates/")
 
 API_HOST = os.environ.get('API_HOST', 'api')
-API_PORT = os.environ.get('API_PORT', '8080')
+API_PORT = os.environ.get('API_PORT', '8181')
 
 
 # backend for courses
@@ -20,12 +21,12 @@ def index(request: Request):
     try:
         r = requests.get(f'http://{API_HOST}:{API_PORT}/mct/courses')
         data = r.json()
-        return templates.TemplateResponse('index.html', 
-                        context={'title': 'Courses', 'request': request, 'courses': data})
+        return templates.TemplateResponse('index.html',
+                                          context={'title': 'Courses', 'request': request, 'courses': data})
 
     except requests.exceptions.ConnectionError as err:
         print('Did you fill in the correct API_HOST environment value?')
         print(err)
         error_message = f"Can not connect to API @ '{API_HOST}:{API_PORT}'"
-        return templates.TemplateResponse('index.html', 
-                        context={'title': 'ERROR', 'request': request, 'error': error_message })
+        return templates.TemplateResponse('index.html',
+                                          context={'title': 'ERROR', 'request': request, 'error': error_message})
